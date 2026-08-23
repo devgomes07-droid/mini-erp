@@ -3,12 +3,11 @@ package com.gabriel.mini_erp.service;
 import com.gabriel.mini_erp.dto.request.ProdutoRequestDTO;
 import com.gabriel.mini_erp.dto.response.ProdutoResponseDTO;
 import com.gabriel.mini_erp.entity.Produto;
+import com.gabriel.mini_erp.exception.RecursoNaoEncontrado;
 import com.gabriel.mini_erp.repository.ProdutoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 
 @Service
 public class ProdutoService {
@@ -39,13 +38,13 @@ public class ProdutoService {
 
     public ProdutoResponseDTO buscarPorId(Long id) {
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Produto não encontrado com id: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontrado("Produto não encontrado com id: " + id));
         return toResponseDTO(produto);
     }
 
     public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO dto) {
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Produto não encontrado com id: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontrado("Produto não encontrado com id: " + id));
 
         produto.setNome(dto.getNome());
         produto.setDescricao(dto.getDescricao());
@@ -60,7 +59,7 @@ public class ProdutoService {
 
     public void deletar(Long id) {
         if (!produtoRepository.existsById(id)) {
-            throw new NoSuchElementException("Produto não encontrado com id: " + id);
+            throw new RecursoNaoEncontrado("Produto não encontrado com id: " + id);
         }
         produtoRepository.deleteById(id);
     }
