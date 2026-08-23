@@ -36,6 +36,11 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.buscarPorId(id));
     }
 
+    @PutMapping("/{id}/confirmar")
+    public ResponseEntity<PedidoResponseDTO> confirmar(@PathVariable Long id) {
+        return ResponseEntity.ok(pedidoService.confirmar(id));
+    }
+
     @PutMapping("/{id}/cancelar")
     public ResponseEntity<Void> cancelar(@PathVariable Long id) {
         pedidoService.cancelar(id);

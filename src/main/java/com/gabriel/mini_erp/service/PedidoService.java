@@ -9,6 +9,7 @@ import com.gabriel.mini_erp.entity.ItemPedido;
 import com.gabriel.mini_erp.entity.Pedido;
 import com.gabriel.mini_erp.entity.Produto;
 import com.gabriel.mini_erp.enums.StatusPedido;
+import com.gabriel.mini_erp.exception.EstoqueInsuficienteException;
 import com.gabriel.mini_erp.repository.ClienteRepository;
 import com.gabriel.mini_erp.repository.PedidoRepository;
 import com.gabriel.mini_erp.repository.ProdutoRepository;
@@ -58,7 +59,7 @@ public class PedidoService {
             item.setPedido(pedido);
             item.setProduto(produto);
             item.setQuantidade(itemDto.getQuantidade());
-            item.setPrecoUnitario(produto.getPreco()); // snapshot do preço atual
+            item.setPrecoUnitario(produto.getPreco());
 
             pedido.getItens().add(item);
 
@@ -94,6 +95,37 @@ public class PedidoService {
 
         pedido.setStatus(StatusPedido.CANCELADO);
         pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public PedidoResponseDTO confirmar(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Pedido não encontrado com id: " + id));
+
+        if (pedido.getStatus() != StatusPedido.PENDENTE) {
+            throw new IllegalStateException("Apenas pedidos pendentes podem ser confirmados");
+        }
+
+        for (ItemPedido item : pedido.getItens()) {
+            Produto produto = produtoRepository.findById(item.getProduto().getId())
+                    .orElseThrow(() -> new NoSuchElementException("Produto não encontrado"));
+
+            if (produto.getQuantidadeEstoque() < item.getQuantidade()) {
+                throw new EstoqueInsuficienteException(
+                        "Estoque insuficiente para o produto: " + produto.getNome() +
+                                ". Disponível: " + produto.getQuantidadeEstoque() +
+                                ", solicitado: " + item.getQuantidade()
+                );
+            }
+
+            produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - item.getQuantidade());
+            produtoRepository.save(produto);
+        }
+
+        pedido.setStatus(StatusPedido.CONFIRMADO);
+        Pedido confirmado = pedidoRepository.save(pedido);
+
+        return toResponseDTO(confirmado);
     }
 
     private PedidoResponseDTO toResponseDTO(Pedido pedido) {
