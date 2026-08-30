@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   listarProdutos,
   listarClientes,
+  listarPedidos,
   criarPedido,
   confirmarPedido,
 } from "../services/api";
@@ -11,34 +12,39 @@ import "./Pedidos.css";
 function Pedidos() {
   const [produtos, setProdutos] = useState([]);
   const [clientes, setClientes] = useState([]);
+  const [historico, setHistorico] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
+  const [aba, setAba] = useState("pendentes");
+  const [confirmandoId, setConfirmandoId] = useState(null);
 
   const [clienteId, setClienteId] = useState("");
   const [itens, setItens] = useState([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState("");
   const [quantidade, setQuantidade] = useState(1);
-
-  const [pedidoAtual, setPedidoAtual] = useState(null);
-  const [confirmando, setConfirmando] = useState(false);
   const [criando, setCriando] = useState(false);
+  const [mostrarForm, setMostrarForm] = useState(false);
+
+  async function carregarTudo() {
+    try {
+      setCarregando(true);
+      const [dataProdutos, dataClientes, dataPedidos] = await Promise.all([
+        listarProdutos(),
+        listarClientes(),
+        listarPedidos(),
+      ]);
+      setProdutos(dataProdutos.content || dataProdutos);
+      setClientes(dataClientes.content || dataClientes);
+      setHistorico(dataPedidos.content || dataPedidos);
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   useEffect(() => {
-    async function carregar() {
-      try {
-        const [dataProdutos, dataClientes] = await Promise.all([
-          listarProdutos(),
-          listarClientes(),
-        ]);
-        setProdutos(dataProdutos.content || dataProdutos);
-        setClientes(dataClientes.content || dataClientes);
-      } catch (err) {
-        setErro(err.message);
-      } finally {
-        setCarregando(false);
-      }
-    }
-    carregar();
+    carregarTudo();
   }, []);
 
   function adicionarItem() {
@@ -64,13 +70,14 @@ function Pedidos() {
     setErro("");
 
     try {
-      const pedido = await criarPedido({
+      await criarPedido({
         clienteId: Number(clienteId),
         itens: itens.map((i) => ({ produtoId: i.produtoId, quantidade: i.quantidade })),
       });
-      setPedidoAtual(pedido);
       setItens([]);
       setClienteId("");
+      setMostrarForm(false);
+      await carregarTudo();
     } catch (err) {
       setErro(err.message);
     } finally {
@@ -78,34 +85,41 @@ function Pedidos() {
     }
   }
 
-  async function handleConfirmar() {
-    if (!pedidoAtual) return;
-    setConfirmando(true);
+  async function handleConfirmar(id) {
+    setConfirmandoId(id);
     setErro("");
 
     try {
-      const atualizado = await confirmarPedido(pedidoAtual.id);
-      setPedidoAtual(atualizado);
+      await confirmarPedido(id);
+      await carregarTudo();
     } catch (err) {
       setErro(err.message);
     } finally {
-      setConfirmando(false);
+      setConfirmandoId(null);
     }
   }
 
   const totalCarrinho = itens.reduce((sum, i) => sum + i.preco * i.quantidade, 0);
 
+  const pendentes = historico.filter((p) => p.status === "PENDENTE").slice().reverse();
+  const confirmados = historico.filter((p) => p.status === "CONFIRMADO").slice().reverse();
+  const listaExibida = aba === "pendentes" ? pendentes : confirmados;
+
   return (
     <Layout>
       <div className="pedidos-header">
-        <h1 className="pedidos-title">Novo Pedido</h1>
-        <p className="pedidos-subtitle">Monte o pedido e confirme para dar baixa no estoque</p>
+        <div>
+          <h1 className="pedidos-title">Pedidos</h1>
+          <p className="pedidos-subtitle">Gerencie pedidos pendentes e confirmados</p>
+        </div>
+        <button className="pedidos-btn-novo-topo" onClick={() => setMostrarForm(!mostrarForm)}>
+          {mostrarForm ? "Cancelar" : "+ Novo pedido"}
+        </button>
       </div>
 
-      {carregando && <p className="pedidos-msg">Carregando...</p>}
       {erro && <p className="pedidos-erro">{erro}</p>}
 
-      {!carregando && !pedidoAtual && (
+      {mostrarForm && (
         <div className="pedidos-form">
           <div className="pedidos-field">
             <label>Cliente</label>
@@ -176,50 +190,61 @@ function Pedidos() {
         </div>
       )}
 
-      {pedidoAtual && (
-        <div className="pedidos-resultado">
-          <div className="pedidos-resultado-header">
-            <div>
-              <h2>Pedido #{pedidoAtual.id}</h2>
-              <p>{pedidoAtual.clienteNome}</p>
-            </div>
-            <span className={`pedidos-status ${pedidoAtual.status.toLowerCase()}`}>
-              {pedidoAtual.status}
-            </span>
-          </div>
+      <div className="pedidos-abas">
+        <button
+          className={`pedidos-aba ${aba === "pendentes" ? "active" : ""}`}
+          onClick={() => setAba("pendentes")}
+        >
+          Pendentes <span className="pedidos-aba-count">{pendentes.length}</span>
+        </button>
+        <button
+          className={`pedidos-aba ${aba === "confirmados" ? "active" : ""}`}
+          onClick={() => setAba("confirmados")}
+        >
+          Confirmados <span className="pedidos-aba-count">{confirmados.length}</span>
+        </button>
+      </div>
 
-          <div className="pedidos-resultado-itens">
-            {pedidoAtual.itens.map((item) => (
-              <div key={item.id} className="pedidos-resultado-item">
-                <span>{item.quantidade}x {item.produtoNome}</span>
-                <span>R$ {Number(item.subtotal).toFixed(2)}</span>
+      {carregando && <p className="pedidos-msg">Carregando...</p>}
+
+      {!carregando && listaExibida.length === 0 && (
+        <p className="pedidos-msg">Nenhum pedido {aba === "pendentes" ? "pendente" : "confirmado"}.</p>
+      )}
+
+      {!carregando && listaExibida.length > 0 && (
+        <div className="pedidos-historico-lista">
+          {listaExibida.map((p) => (
+            <div key={p.id} className="pedidos-historico-item">
+              <div className="pedidos-historico-info">
+                <span className="pedidos-historico-cliente">
+                  #{p.id} — {p.clienteNome}
+                </span>
+                <span className="pedidos-historico-data">
+                  {new Date(p.dataPedido + "Z").toLocaleString("pt-BR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
               </div>
-            ))}
-          </div>
-
-          <div className="pedidos-resultado-total">
-            <span>Total</span>
-            <span>R$ {Number(pedidoAtual.valorTotal).toFixed(2)}</span>
-          </div>
-
-          {pedidoAtual.status === "PENDENTE" && (
-            <button
-              className="pedidos-btn-confirmar"
-              onClick={handleConfirmar}
-              disabled={confirmando}
-            >
-              {confirmando ? "Confirmando..." : "Confirmar pedido"}
-            </button>
-          )}
-
-          {pedidoAtual.status === "CONFIRMADO" && (
-            <>
-              <p className="pedidos-sucesso">✓ Estoque atualizado com sucesso</p>
-              <button className="pedidos-btn-novo" onClick={() => setPedidoAtual(null)}>
-                Criar outro pedido
-              </button>
-            </>
-          )}
+              <span className="pedidos-historico-valor">
+                R$ {Number(p.valorTotal).toFixed(2)}
+              </span>
+              {p.status === "PENDENTE" ? (
+                <button
+                  className="pedidos-btn-confirmar-mini"
+                  onClick={() => handleConfirmar(p.id)}
+                  disabled={confirmandoId === p.id}
+                >
+                  {confirmandoId === p.id ? "..." : "Confirmar"}
+                </button>
+              ) : (
+                <span className="pedidos-status confirmado">CONFIRMADO</span>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </Layout>

@@ -117,3 +117,18 @@ export async function confirmarPedido(id) {
 
   return res.json();
 }
+export async function listarPedidos() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/pedidos`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao buscar pedidos");
+  }
+
+  return res.json();
+}
