@@ -43,3 +43,37 @@ export async function registrar(email, senha) {
 
   return res.json();
 }
+export async function listarClientes() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/clientes`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao buscar clientes");
+  }
+
+  return res.json();
+}
+
+export async function criarCliente(cliente) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/clientes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(cliente),
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao criar cliente");
+  }
+
+  return res.json();
+}

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import Produtos from "./pages/Produtos";
+import Clientes from "./pages/Clientes";
 import RotaProtegida from "./components/RotaProtegida";
 
 function App() {
@@ -15,6 +16,14 @@ function App() {
           element={
             <RotaProtegida>
               <Produtos />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/clientes"
+          element={
+            <RotaProtegida>
+              <Clientes />
             </RotaProtegida>
           }
         />
