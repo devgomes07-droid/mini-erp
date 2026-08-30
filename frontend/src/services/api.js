@@ -14,6 +14,20 @@ export async function login(email, senha) {
   return res.json();
 }
 
+export async function registrar(email, senha) {
+  const res = await fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, senha }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao cadastrar. Email pode já estar em uso.");
+  }
+
+  return res.json();
+}
+
 export async function listarProdutos() {
   const token = localStorage.getItem("token");
 
@@ -30,19 +44,6 @@ export async function listarProdutos() {
   return res.json();
 }
 
-export async function registrar(email, senha) {
-  const res = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, senha }),
-  });
-
-  if (!res.ok) {
-    throw new Error("Erro ao cadastrar. Email pode já estar em uso.");
-  }
-
-  return res.json();
-}
 export async function listarClientes() {
   const token = localStorage.getItem("token");
 
@@ -73,6 +74,45 @@ export async function criarCliente(cliente) {
 
   if (!res.ok) {
     throw new Error("Erro ao criar cliente");
+  }
+
+  return res.json();
+}
+
+export async function criarPedido(pedido) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/pedidos`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(pedido),
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao criar pedido");
+  }
+
+  return res.json();
+}
+
+export async function confirmarPedido(id) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/pedidos/${id}/confirmar`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    if (res.status === 409) {
+      throw new Error("Conflito de estoque — outro pedido já consumiu essa quantidade");
+    }
+    throw new Error("Erro ao confirmar pedido");
   }
 
   return res.json();

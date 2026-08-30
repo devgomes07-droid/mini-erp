@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import Produtos from "./pages/Produtos";
 import Clientes from "./pages/Clientes";
+import Pedidos from "./pages/Pedidos";
 import RotaProtegida from "./components/RotaProtegida";
 
 function App() {
@@ -24,6 +25,14 @@ function App() {
           element={
             <RotaProtegida>
               <Clientes />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/pedidos"
+          element={
+            <RotaProtegida>
+              <Pedidos />
             </RotaProtegida>
           }
         />
