@@ -24,48 +24,83 @@ function Login() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
-        <h2 className="auth-title">Mini ERP</h2>
-        <p className="auth-subtitle">Entre na sua conta</p>
+      <div className="auth-ledger">
+        <div className="auth-ledger-brand">
+          <div className="auth-ledger-mark">M</div>
+          <span className="auth-ledger-brandname">Mini ERP</span>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="auth-field">
-            <label className="auth-label">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="auth-input"
-              placeholder="seu@email.com"
-              required
-            />
+        <div className="auth-ledger-main">
+          <div className="auth-ledger-eyebrow">Sistema em operação</div>
+          <h1 className="auth-ledger-title">
+            Estoque e vendas sob controle, em tempo real.
+          </h1>
+          <p className="auth-ledger-desc">
+            Cada confirmação de pedido dá baixa automática no estoque,
+            com proteção contra concorrência entre vendas simultâneas.
+          </p>
+        </div>
+
+        <div className="auth-ledger-rows">
+          <div className="auth-ledger-row">
+            <span>Controle de estoque</span>
+            <span className="tag">Em tempo real</span>
           </div>
-
-          <div className="auth-field">
-            <label className="auth-label">Senha</label>
-            <input
-              type="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              className="auth-input"
-              placeholder="••••••••"
-              required
-            />
+          <div className="auth-ledger-row">
+            <span>Confirmação de pedidos</span>
+            <span className="tag">Automática</span>
           </div>
+          <div className="auth-ledger-row">
+            <span>Concorrência</span>
+            <span className="tag warn">Protegida</span>
+          </div>
+        </div>
+      </div>
 
-          {erro && <p className="auth-erro">{erro}</p>}
+      <div className="auth-form-side">
+        <div className="auth-card">
+          <h2 className="auth-title">Entrar</h2>
+          <p className="auth-subtitle">Acesse sua conta do Mini ERP</p>
 
-          <button type="submit" className="auth-button auth-button-login">
-            Entrar
-          </button>
-        </form>
+          <form onSubmit={handleSubmit}>
+            <div className="auth-field">
+              <label className="auth-label">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="auth-input"
+                placeholder="seu@email.com"
+                required
+              />
+            </div>
 
-        <p className="auth-footer">
-          Não tem conta?{" "}
-          <a href="/cadastro" className="auth-link">
-            Cadastre-se
-          </a>
-        </p>
+            <div className="auth-field">
+              <label className="auth-label">Senha</label>
+              <input
+                type="password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                className="auth-input"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            {erro && <p className="auth-erro">⚠ {erro}</p>}
+
+            <button type="submit" className="auth-button">
+              Entrar
+            </button>
+          </form>
+
+          <p className="auth-footer">
+            Não tem conta?{" "}
+            <a href="/cadastro" className="auth-link">
+              Cadastre-se
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

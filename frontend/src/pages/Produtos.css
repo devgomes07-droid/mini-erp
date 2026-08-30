@@ -1,0 +1,114 @@
+.produtos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.produtos-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #e7e9ec;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.produtos-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #8a93a3;
+  margin: 6px 0 0;
+}
+
+.produtos-msg {
+  color: #8a93a3;
+  font-size: 14px;
+}
+
+.produtos-msg.erro {
+  color: #ff8080;
+}
+
+.produtos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.produto-card {
+  background: #1c2027;
+  border: 1px solid #2b303a;
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.produto-card:hover {
+  border-color: #f5a524;
+  transform: translateY(-2px);
+}
+
+.produto-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.produto-categoria {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5b6472;
+  background: #14171c;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.produto-alerta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #f5a524;
+  background: rgba(245, 165, 36, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.produto-nome {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #e7e9ec;
+  margin: 0 0 6px;
+}
+
+.produto-desc {
+  font-size: 13px;
+  color: #8a93a3;
+  line-height: 1.5;
+  margin: 0 0 20px;
+  min-height: 36px;
+}
+
+.produto-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px dashed #2b303a;
+}
+
+.produto-preco {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #3ddc97;
+}
+
+.produto-estoque {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #8a93a3;
+}
