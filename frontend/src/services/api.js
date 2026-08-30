@@ -29,3 +29,17 @@ export async function listarProdutos() {
 
   return res.json();
 }
+
+export async function registrar(email, senha) {
+  const res = await fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, senha }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao cadastrar. Email pode já estar em uso.");
+  }
+
+  return res.json();
+}
