@@ -1,20 +1,22 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { login } from "../services/api";
 
 function Login() {
+    const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
+
 
   async function handleSubmit(e) {
     e.preventDefault();
     setErro("");
 
     try {
-      const data = await login(email, senha);
-      localStorage.setItem("token", data.token);
-      alert("Login realizado com sucesso!");
-      console.log("Token:", data.token);
+        const data = await login(email, senha);
+           localStorage.setItem("token", data.token);
+           navigate("/produtos");
     } catch (err) {
       setErro(err.message);
     }
