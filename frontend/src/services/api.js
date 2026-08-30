@@ -1,0 +1,31 @@
+const API_URL = "https://mini-erp-api-qh1u.onrender.com";
+
+export async function login(email, senha) {
+  const res = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, senha }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Email ou senha inválidos");
+  }
+
+  return res.json();
+}
+
+export async function listarProdutos() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/produtos`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao buscar produtos");
+  }
+
+  return res.json();
+}
