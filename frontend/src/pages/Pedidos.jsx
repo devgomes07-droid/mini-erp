@@ -19,6 +19,7 @@ function Pedidos() {
   const [confirmandoId, setConfirmandoId] = useState(null);
 
   const [clienteId, setClienteId] = useState("");
+  const [enderecoEntrega, setEnderecoEntrega] = useState("");
   const [itens, setItens] = useState([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState("");
   const [quantidade, setQuantidade] = useState(1);
@@ -73,9 +74,11 @@ function Pedidos() {
       await criarPedido({
         clienteId: Number(clienteId),
         itens: itens.map((i) => ({ produtoId: i.produtoId, quantidade: i.quantidade })),
+        enderecoEntrega: enderecoEntrega,
       });
       setItens([]);
       setClienteId("");
+      setEnderecoEntrega("");
       setMostrarForm(false);
       await carregarTudo();
     } catch (err) {
@@ -131,6 +134,16 @@ function Pedidos() {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="pedidos-field">
+            <label>Endereço de entrega</label>
+            <input
+              type="text"
+              value={enderecoEntrega}
+              onChange={(e) => setEnderecoEntrega(e.target.value)}
+              placeholder="Rua, número - Bairro, Cidade"
+            />
           </div>
 
           <div className="pedidos-add-item">
@@ -228,6 +241,9 @@ function Pedidos() {
                     minute: "2-digit",
                   })}
                 </span>
+                {p.enderecoEntrega && (
+                  <span className="pedidos-historico-endereco">📍 {p.enderecoEntrega}</span>
+                )}
               </div>
               <span className="pedidos-historico-valor">
                 R$ {Number(p.valorTotal).toFixed(2)}
