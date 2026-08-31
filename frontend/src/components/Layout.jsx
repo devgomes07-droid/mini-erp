@@ -11,6 +11,7 @@ function Layout({ children }) {
   }
 
   const menu = [
+    { label: "Dashboard", path: "/dashboard" },
     { label: "Produtos", path: "/produtos" },
     { label: "Pedidos", path: "/pedidos" },
     { label: "Clientes", path: "/clientes" },

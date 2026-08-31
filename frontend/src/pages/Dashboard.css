@@ -1,0 +1,150 @@
+.dash-header {
+  margin-bottom: 28px;
+}
+
+.dash-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #e7e9ec;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.dash-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  color: #8a93a3;
+  margin: 6px 0 0;
+}
+
+.dash-msg {
+  color: #8a93a3;
+  font-size: 14px;
+}
+
+.dash-msg.erro {
+  color: #ff8080;
+}
+
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.dash-card {
+  background: #1c2027;
+  border: 1px solid #2b303a;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a93a3;
+}
+
+.dash-card-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #e7e9ec;
+}
+
+.dash-card-value.verde {
+  color: #3ddc97;
+}
+
+.dash-chart-box {
+  background: #1c2027;
+  border: 1px solid #2b303a;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.dash-section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #e7e9ec;
+  margin: 0 0 18px;
+}
+
+.dash-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.dash-list-box {
+  background: #1c2027;
+  border: 1px solid #2b303a;
+  border-radius: 12px;
+  padding: 22px;
+}
+
+.dash-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed #2b303a;
+}
+
+.dash-list-item:last-child {
+  border-bottom: none;
+}
+
+.dash-list-rank {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(245, 165, 36, 0.12);
+  color: #f5a524;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dash-list-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dash-list-name {
+  font-size: 13.5px;
+  color: #e7e9ec;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-list-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #5b6472;
+}
+
+.dash-list-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #3ddc97;
+  flex-shrink: 0;
+}

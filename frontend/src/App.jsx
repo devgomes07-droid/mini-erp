@@ -4,6 +4,7 @@ import Cadastro from "./pages/Cadastro";
 import Produtos from "./pages/Produtos";
 import Clientes from "./pages/Clientes";
 import Pedidos from "./pages/Pedidos";
+import Dashboard from "./pages/Dashboard";
 import RotaProtegida from "./components/RotaProtegida";
 
 function App() {
@@ -12,6 +13,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
+        <Route
+          path="/dashboard"
+          element={
+            <RotaProtegida>
+              <Dashboard />
+            </RotaProtegida>
+          }
+        />
         <Route
           path="/produtos"
           element={

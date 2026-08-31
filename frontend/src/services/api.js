@@ -132,3 +132,18 @@ export async function listarPedidos() {
 
   return res.json();
 }
+export async function buscarFaturamento(inicio, fim) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/relatorios/faturamento?inicio=${inicio}&fim=${fim}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao buscar relatório de faturamento");
+  }
+
+  return res.json();
+}
