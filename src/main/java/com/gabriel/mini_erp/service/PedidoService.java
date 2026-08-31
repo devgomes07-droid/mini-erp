@@ -48,6 +48,7 @@ public class PedidoService {
         pedido.setCliente(cliente);
         pedido.setDataPedido(LocalDateTime.now());
         pedido.setStatus(StatusPedido.PENDENTE);
+        pedido.setEnderecoEntrega(dto.getEnderecoEntrega());
 
         BigDecimal valorTotal = BigDecimal.ZERO;
 
@@ -136,6 +137,7 @@ public class PedidoService {
         dto.setDataPedido(pedido.getDataPedido());
         dto.setStatus(pedido.getStatus());
         dto.setValorTotal(pedido.getValorTotal());
+        dto.setEnderecoEntrega(pedido.getEnderecoEntrega());
 
         List<ItemPedidoResponseDTO> itensDto = pedido.getItens().stream()
                 .map(this::toItemResponseDTO)

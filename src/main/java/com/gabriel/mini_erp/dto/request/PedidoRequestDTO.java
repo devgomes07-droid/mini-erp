@@ -22,4 +22,6 @@ public class PedidoRequestDTO {
     @NotEmpty(message = "Pedido deve ter ao menos um item")
     @Valid
     private List<ItemPedidoRequestDTO> itens;
+
+    private String enderecoEntrega;
 }

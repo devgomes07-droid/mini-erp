@@ -22,5 +22,6 @@ public class PedidoResponseDTO {
     private LocalDateTime dataPedido;
     private StatusPedido status;
     private BigDecimal valorTotal;
+    private String enderecoEntrega;
     private List<ItemPedidoResponseDTO> itens;
 }
