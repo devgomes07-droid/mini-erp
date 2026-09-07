@@ -3,8 +3,7 @@ Mini-ERP — Sistema de Gestão com Controle de Estoque
 Mini-ERP com baixa automática de estoque, controle de concorrência via optimistic locking (@Version) e autenticação JWT. Backend em Spring Boot + PostgreSQL, frontend em React.
 
 📁 Repositório
-
-✨ Features
+ Features
 🔐 Autenticação
 Autenticação stateless via JWT
 Login e registro de usuários
