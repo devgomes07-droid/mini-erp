@@ -148,3 +148,42 @@
   color: #3ddc97;
   flex-shrink: 0;
 }
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.dash-periodo {
+  display: flex;
+  gap: 6px;
+  background: #1c2027;
+  border: 1px solid #2b303a;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.dash-periodo-btn {
+  padding: 7px 14px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: #8a93a3;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.dash-periodo-btn.active {
+  background: #f5a524;
+  color: #14171c;
+  font-weight: 700;
+}
+
+.dash-card-value.pequeno {
+  font-size: 15px;
+  line-height: 1.3;
+}
