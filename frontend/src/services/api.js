@@ -147,3 +147,21 @@ export async function buscarFaturamento(inicio, fim) {
 
   return res.json();
 }
+export async function criarProduto(produto) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/produtos`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(produto),
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao criar produto");
+  }
+
+  return res.json();
+}
