@@ -1,270 +1,121 @@
+
 import { useState, useEffect } from "react";
-import {
-  listarProdutos,
-  listarClientes,
-  listarPedidos,
-  criarPedido,
-  confirmarPedido,
-} from "../services/api";
+import { listarProdutos } from "../services/api";
 import Layout from "../components/Layout";
-import "./Pedidos.css";
+import "./Produtos.css";
 
-function Pedidos() {
+function Produtos() {
   const [produtos, setProdutos] = useState([]);
-  const [clientes, setClientes] = useState([]);
-  const [historico, setHistorico] = useState([]);
-  const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
-  const [aba, setAba] = useState("pendentes");
-  const [confirmandoId, setConfirmandoId] = useState(null);
-
-  const [clienteId, setClienteId] = useState("");
-  const [enderecoEntrega, setEnderecoEntrega] = useState("");
-  const [itens, setItens] = useState([]);
-  const [produtoSelecionado, setProdutoSelecionado] = useState("");
-  const [quantidade, setQuantidade] = useState(1);
-  const [criando, setCriando] = useState(false);
-  const [mostrarForm, setMostrarForm] = useState(false);
-
-  async function carregarTudo() {
-    try {
-      setCarregando(true);
-      const [dataProdutos, dataClientes, dataPedidos] = await Promise.all([
-        listarProdutos(),
-        listarClientes(),
-        listarPedidos(),
-      ]);
-      setProdutos(dataProdutos.content || dataProdutos);
-      setClientes(dataClientes.content || dataClientes);
-      setHistorico(dataPedidos.content || dataPedidos);
-    } catch (err) {
-      setErro(err.message);
-    } finally {
-      setCarregando(false);
-    }
-  }
+  const [carregando, setCarregando] = useState(true);
+  const [busca, setBusca] = useState("");
+  const [categoriaFiltro, setCategoriaFiltro] = useState("");
 
   useEffect(() => {
-    carregarTudo();
+    async function carregar() {
+      try {
+        const data = await listarProdutos();
+        setProdutos(data.content || data);
+      } catch (err) {
+        setErro(err.message);
+      } finally {
+        setCarregando(false);
+      }
+    }
+    carregar();
   }, []);
 
-  function adicionarItem() {
-    if (!produtoSelecionado || quantidade < 1) return;
-    const produto = produtos.find((p) => p.id === Number(produtoSelecionado));
-    if (!produto) return;
+  const categorias = [...new Set(produtos.map((p) => p.categoria))].sort();
 
-    setItens([
-      ...itens,
-      { produtoId: produto.id, nome: produto.nome, quantidade: Number(quantidade), preco: produto.preco },
-    ]);
-    setProdutoSelecionado("");
-    setQuantidade(1);
-  }
+  const produtosFiltrados = produtos.filter((p) => {
+    const termo = busca.toLowerCase();
+    const bateBusca =
+      p.nome.toLowerCase().includes(termo) ||
+      (p.categoria && p.categoria.toLowerCase().includes(termo));
+    const bateCategoria = !categoriaFiltro || p.categoria === categoriaFiltro;
+    return bateBusca && bateCategoria;
+  });
 
-  function removerItem(index) {
-    setItens(itens.filter((_, i) => i !== index));
-  }
-
-  async function handleCriarPedido() {
-    if (!clienteId || itens.length === 0) return;
-    setCriando(true);
-    setErro("");
-
-    try {
-      await criarPedido({
-        clienteId: Number(clienteId),
-        itens: itens.map((i) => ({ produtoId: i.produtoId, quantidade: i.quantidade })),
-        enderecoEntrega: enderecoEntrega,
-      });
-      setItens([]);
-      setClienteId("");
-      setEnderecoEntrega("");
-      setMostrarForm(false);
-      await carregarTudo();
-    } catch (err) {
-      setErro(err.message);
-    } finally {
-      setCriando(false);
-    }
-  }
-
-  async function handleConfirmar(id) {
-    setConfirmandoId(id);
-    setErro("");
-
-    try {
-      await confirmarPedido(id);
-      await carregarTudo();
-    } catch (err) {
-      setErro(err.message);
-    } finally {
-      setConfirmandoId(null);
-    }
-  }
-
-  const totalCarrinho = itens.reduce((sum, i) => sum + i.preco * i.quantidade, 0);
-
-  const pendentes = historico.filter((p) => p.status === "PENDENTE").slice().reverse();
-  const confirmados = historico.filter((p) => p.status === "CONFIRMADO").slice().reverse();
-  const listaExibida = aba === "pendentes" ? pendentes : confirmados;
+  const estoqueBaixoCount = produtos.filter(
+    (p) => p.quantidadeEstoque <= p.estoqueMinimo
+  ).length;
 
   return (
     <Layout>
-      <div className="pedidos-header">
+      <div className="produtos-header">
         <div>
-          <h1 className="pedidos-title">Pedidos</h1>
-          <p className="pedidos-subtitle">Gerencie pedidos pendentes e confirmados</p>
-        </div>
-        <button className="pedidos-btn-novo-topo" onClick={() => setMostrarForm(!mostrarForm)}>
-          {mostrarForm ? "Cancelar" : "+ Novo pedido"}
-        </button>
-      </div>
-
-      {erro && <p className="pedidos-erro">{erro}</p>}
-
-      {mostrarForm && (
-        <div className="pedidos-form">
-          <div className="pedidos-field">
-            <label>Cliente</label>
-            <select value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
-              <option value="">Selecione um cliente</option>
-              {clientes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nome}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="pedidos-field">
-            <label>Endereço de entrega</label>
-            <input
-              type="text"
-              value={enderecoEntrega}
-              onChange={(e) => setEnderecoEntrega(e.target.value)}
-              placeholder="Rua, número - Bairro, Cidade"
-            />
-          </div>
-
-          <div className="pedidos-add-item">
-            <div className="pedidos-field">
-              <label>Produto</label>
-              <select
-                value={produtoSelecionado}
-                onChange={(e) => setProdutoSelecionado(e.target.value)}
-              >
-                <option value="">Selecione um produto</option>
-                {produtos.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nome} — R$ {Number(p.preco).toFixed(2)} ({p.quantidadeEstoque} un)
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="pedidos-field pedidos-qtd">
-              <label>Qtd</label>
-              <input
-                type="number"
-                min="1"
-                value={quantidade}
-                onChange={(e) => setQuantidade(e.target.value)}
-              />
-            </div>
-
-            <button className="pedidos-btn-add" onClick={adicionarItem}>
-              Adicionar
-            </button>
-          </div>
-
-          {itens.length > 0 && (
-            <div className="pedidos-carrinho">
-              {itens.map((item, i) => (
-                <div key={i} className="pedidos-carrinho-item">
-                  <span>{item.quantidade}x {item.nome}</span>
-                  <span>R$ {(item.preco * item.quantidade).toFixed(2)}</span>
-                  <button onClick={() => removerItem(i)}>×</button>
-                </div>
-              ))}
-              <div className="pedidos-carrinho-total">
-                <span>Total</span>
-                <span>R$ {totalCarrinho.toFixed(2)}</span>
-              </div>
-            </div>
-          )}
-
-          <button
-            className="pedidos-btn-criar"
-            onClick={handleCriarPedido}
-            disabled={!clienteId || itens.length === 0 || criando}
-          >
-            {criando ? "Criando..." : "Criar pedido"}
-          </button>
-        </div>
-      )}
-
-      <div className="pedidos-abas">
-        <button
-          className={`pedidos-aba ${aba === "pendentes" ? "active" : ""}`}
-          onClick={() => setAba("pendentes")}
-        >
-          Pendentes <span className="pedidos-aba-count">{pendentes.length}</span>
-        </button>
-        <button
-          className={`pedidos-aba ${aba === "confirmados" ? "active" : ""}`}
-          onClick={() => setAba("confirmados")}
-        >
-          Confirmados <span className="pedidos-aba-count">{confirmados.length}</span>
-        </button>
-      </div>
-
-      {carregando && <p className="pedidos-msg">Carregando...</p>}
-
-      {!carregando && listaExibida.length === 0 && (
-        <p className="pedidos-msg">Nenhum pedido {aba === "pendentes" ? "pendente" : "confirmado"}.</p>
-      )}
-
-      {!carregando && listaExibida.length > 0 && (
-        <div className="pedidos-historico-lista">
-          {listaExibida.map((p) => (
-            <div key={p.id} className="pedidos-historico-item">
-              <div className="pedidos-historico-info">
-                <span className="pedidos-historico-cliente">
-                  #{p.id} — {p.clienteNome}
-                </span>
-                <span className="pedidos-historico-data">
-                  {new Date(p.dataPedido + "Z").toLocaleString("pt-BR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-                {p.enderecoEntrega && (
-                  <span className="pedidos-historico-endereco">📍 {p.enderecoEntrega}</span>
-                )}
-              </div>
-              <span className="pedidos-historico-valor">
-                R$ {Number(p.valorTotal).toFixed(2)}
+          <h1 className="produtos-title">Produtos</h1>
+          <p className="produtos-subtitle">
+            {produtos.length} {produtos.length === 1 ? "item" : "itens"} no catálogo
+            {estoqueBaixoCount > 0 && (
+              <span className="produtos-alerta-count">
+                {" "}• {estoqueBaixoCount} com estoque baixo
               </span>
-              {p.status === "PENDENTE" ? (
-                <button
-                  className="pedidos-btn-confirmar-mini"
-                  onClick={() => handleConfirmar(p.id)}
-                  disabled={confirmandoId === p.id}
-                >
-                  {confirmandoId === p.id ? "..." : "Confirmar"}
-                </button>
-              ) : (
-                <span className="pedidos-status confirmado">CONFIRMADO</span>
-              )}
-            </div>
+            )}
+          </p>
+        </div>
+      </div>
+
+      <div className="produtos-filtros">
+        <input
+          type="text"
+          className="produtos-busca-input"
+          placeholder="Buscar por nome ou categoria..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
+        <select
+          className="produtos-categoria-select"
+          value={categoriaFiltro}
+          onChange={(e) => setCategoriaFiltro(e.target.value)}
+        >
+          <option value="">Todas as categorias</option>
+          {categorias.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
+        </select>
+      </div>
+
+      {carregando && <p className="produtos-msg">Carregando produtos...</p>}
+      {erro && <p className="produtos-msg erro">{erro}</p>}
+
+      {!carregando && produtosFiltrados.length === 0 && (
+        <p className="produtos-msg">Nenhum produto encontrado.</p>
+      )}
+
+      {!carregando && !erro && (
+        <div className="produtos-grid">
+          {produtosFiltrados.map((p) => {
+            const estoqueBaixo = p.quantidadeEstoque <= p.estoqueMinimo;
+            return (
+              <div key={p.id} className="produto-card">
+                <div className="produto-card-top">
+                  <span className="produto-categoria">{p.categoria}</span>
+                  {estoqueBaixo && (
+                    <span className="produto-alerta">Estoque baixo</span>
+                  )}
+                </div>
+
+                <h3 className="produto-nome">{p.nome}</h3>
+                <p className="produto-desc">{p.descricao}</p>
+
+                <div className="produto-card-bottom">
+                  <span className="produto-preco">
+                    R$ {Number(p.preco).toFixed(2)}
+                  </span>
+                  <span className="produto-estoque">
+                    {p.quantidadeEstoque} un
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </Layout>
   );
 }
 
-export default Pedidos;
+export default Produtos;

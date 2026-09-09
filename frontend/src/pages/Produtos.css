@@ -226,3 +226,45 @@
 .produtos-busca input::placeholder {
   color: #5b6472;
 }
+.produtos-filtros {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.produtos-busca-input {
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+  padding: 10px 14px;
+  background: #1c2027;
+  border: 1px solid #2b303a;
+  border-radius: 8px;
+  color: #e7e9ec;
+  font-size: 14px;
+  outline: none;
+}
+
+.produtos-busca-input:focus {
+  border-color: #f5a524;
+}
+
+.produtos-busca-input::placeholder {
+  color: #5b6472;
+}
+
+.produtos-categoria-select {
+  padding: 10px 14px;
+  background: #1c2027;
+  border: 1px solid #2b303a;
+  border-radius: 8px;
+  color: #e7e9ec;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
+
+.produtos-categoria-select:focus {
+  border-color: #f5a524;
+}
