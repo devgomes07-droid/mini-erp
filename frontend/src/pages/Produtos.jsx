@@ -8,6 +8,7 @@ function Produtos() {
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(true);
   const [busca, setBusca] = useState("");
+  const [categoriaFiltro, setCategoriaFiltro] = useState("");
 
   useEffect(() => {
     async function carregar() {
@@ -23,12 +24,15 @@ function Produtos() {
     carregar();
   }, []);
 
+  const categorias = [...new Set(produtos.map((p) => p.categoria))].sort();
+
   const produtosFiltrados = produtos.filter((p) => {
     const termo = busca.toLowerCase();
-    return (
+    const bateBusca =
       p.nome.toLowerCase().includes(termo) ||
-      (p.categoria && p.categoria.toLowerCase().includes(termo))
-    );
+      (p.categoria && p.categoria.toLowerCase().includes(termo));
+    const bateCategoria = !categoriaFiltro || p.categoria === categoriaFiltro;
+    return bateBusca && bateCategoria;
   });
 
   const estoqueBaixoCount = produtos.filter(
@@ -51,13 +55,26 @@ function Produtos() {
         </div>
       </div>
 
-      <div className="produtos-busca">
+      <div className="produtos-filtros">
         <input
           type="text"
+          className="produtos-busca-input"
           placeholder="Buscar por nome ou categoria..."
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
         />
+        <select
+          className="produtos-categoria-select"
+          value={categoriaFiltro}
+          onChange={(e) => setCategoriaFiltro(e.target.value)}
+        >
+          <option value="">Todas as categorias</option>
+          {categorias.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
       </div>
 
       {carregando && <p className="produtos-msg">Carregando produtos...</p>}
