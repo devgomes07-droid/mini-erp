@@ -7,6 +7,7 @@ import {
   confirmarPedido,
 } from "../services/api";
 import Layout from "../components/Layout";
+import DetalhePedido from "../components/DetalhePedido";
 import "./Pedidos.css";
 
 function Pedidos() {
@@ -17,6 +18,7 @@ function Pedidos() {
   const [erro, setErro] = useState("");
   const [aba, setAba] = useState("pendentes");
   const [confirmandoId, setConfirmandoId] = useState(null);
+  const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
 
   const [clienteId, setClienteId] = useState("");
   const [enderecoEntrega, setEnderecoEntrega] = useState("");
@@ -227,7 +229,12 @@ function Pedidos() {
       {!carregando && listaExibida.length > 0 && (
         <div className="pedidos-historico-lista">
           {listaExibida.map((p) => (
-            <div key={p.id} className="pedidos-historico-item">
+            <div
+              key={p.id}
+              className="pedidos-historico-item"
+              onClick={() => setPedidoSelecionado(p)}
+              style={{ cursor: "pointer" }}
+            >
               <div className="pedidos-historico-info">
                 <span className="pedidos-historico-cliente">
                   #{p.id} — {p.clienteNome}
@@ -251,7 +258,10 @@ function Pedidos() {
               {p.status === "PENDENTE" ? (
                 <button
                   className="pedidos-btn-confirmar-mini"
-                  onClick={() => handleConfirmar(p.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleConfirmar(p.id);
+                  }}
                   disabled={confirmandoId === p.id}
                 >
                   {confirmandoId === p.id ? "..." : "Confirmar"}
@@ -263,6 +273,11 @@ function Pedidos() {
           ))}
         </div>
       )}
+
+      <DetalhePedido
+        pedido={pedidoSelecionado}
+        onClose={() => setPedidoSelecionado(null)}
+      />
     </Layout>
   );
 }
