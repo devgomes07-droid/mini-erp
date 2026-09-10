@@ -90,8 +90,20 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Pedido não encontrado com id: " + id));
 
-        if (pedido.getStatus() != StatusPedido.PENDENTE) {
-            throw new IllegalStateException("Apenas pedidos pendentes podem ser cancelados");
+        if (pedido.getStatus() == StatusPedido.CANCELADO) {
+            throw new IllegalStateException("Este pedido já está cancelado");
+        }
+
+        boolean eraConfirmado = pedido.getStatus() == StatusPedido.CONFIRMADO;
+
+        if (eraConfirmado) {
+            for (ItemPedido item : pedido.getItens()) {
+                Produto produto = produtoRepository.findById(item.getProduto().getId())
+                        .orElseThrow(() -> new NoSuchElementException("Produto não encontrado"));
+
+                produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() + item.getQuantidade());
+                produtoRepository.save(produto);
+            }
         }
 
         pedido.setStatus(StatusPedido.CANCELADO);
