@@ -117,6 +117,22 @@ export async function confirmarPedido(id) {
 
   return res.json();
 }
+
+export async function cancelarPedido(id) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/pedidos/${id}/cancelar`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao cancelar pedido");
+  }
+}
+
 export async function listarPedidos() {
   const token = localStorage.getItem("token");
 
@@ -132,6 +148,7 @@ export async function listarPedidos() {
 
   return res.json();
 }
+
 export async function buscarFaturamento(inicio, fim) {
   const token = localStorage.getItem("token");
 
@@ -147,6 +164,7 @@ export async function buscarFaturamento(inicio, fim) {
 
   return res.json();
 }
+
 export async function criarProduto(produto) {
   const token = localStorage.getItem("token");
 

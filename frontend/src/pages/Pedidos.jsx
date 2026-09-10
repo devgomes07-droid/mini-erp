@@ -5,6 +5,7 @@ import {
   listarPedidos,
   criarPedido,
   confirmarPedido,
+  cancelarPedido,
 } from "../services/api";
 import Layout from "../components/Layout";
 import DetalhePedido from "../components/DetalhePedido";
@@ -18,6 +19,7 @@ function Pedidos() {
   const [erro, setErro] = useState("");
   const [aba, setAba] = useState("pendentes");
   const [confirmandoId, setConfirmandoId] = useState(null);
+  const [cancelandoId, setCancelandoId] = useState(null);
   const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
 
   const [clienteId, setClienteId] = useState("");
@@ -101,6 +103,25 @@ function Pedidos() {
       setErro(err.message);
     } finally {
       setConfirmandoId(null);
+    }
+  }
+
+  async function handleCancelar(id) {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja cancelar este pedido? Se já estiver confirmado, o estoque será devolvido."
+    );
+    if (!confirmar) return;
+
+    setCancelandoId(id);
+    setErro("");
+
+    try {
+      await cancelarPedido(id);
+      await carregarTudo();
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setCancelandoId(null);
     }
   }
 
@@ -255,20 +276,28 @@ function Pedidos() {
               <span className="pedidos-historico-valor">
                 R$ {Number(p.valorTotal).toFixed(2)}
               </span>
-              {p.status === "PENDENTE" ? (
+
+              <div className="pedidos-historico-acoes" onClick={(e) => e.stopPropagation()}>
+                {p.status === "PENDENTE" ? (
+                  <button
+                    className="pedidos-btn-confirmar-mini"
+                    onClick={() => handleConfirmar(p.id)}
+                    disabled={confirmandoId === p.id}
+                  >
+                    {confirmandoId === p.id ? "..." : "Confirmar"}
+                  </button>
+                ) : (
+                  <span className="pedidos-status confirmado">CONFIRMADO</span>
+                )}
+
                 <button
-                  className="pedidos-btn-confirmar-mini"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleConfirmar(p.id);
-                  }}
-                  disabled={confirmandoId === p.id}
+                  className="pedidos-btn-cancelar-mini"
+                  onClick={() => handleCancelar(p.id)}
+                  disabled={cancelandoId === p.id}
                 >
-                  {confirmandoId === p.id ? "..." : "Confirmar"}
+                  {cancelandoId === p.id ? "..." : "Cancelar"}
                 </button>
-              ) : (
-                <span className="pedidos-status confirmado">CONFIRMADO</span>
-              )}
+              </div>
             </div>
           ))}
         </div>
