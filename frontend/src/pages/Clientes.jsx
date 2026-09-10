@@ -3,11 +3,27 @@ import { listarClientes, criarCliente } from "../services/api";
 import Layout from "../components/Layout";
 import "./Clientes.css";
 
+const CORES_AVATAR = ["#f5a524", "#4ade80", "#818cf8", "#f472b6", "#38bdf8", "#fb923c"];
+
+function corPorNome(nome) {
+  const index = nome.charCodeAt(0) % CORES_AVATAR.length;
+  return CORES_AVATAR[index];
+}
+
+function formatarNome(nome) {
+  return nome
+    .toLowerCase()
+    .split(" ")
+    .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
+    .join(" ");
+}
+
 function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [mostrarForm, setMostrarForm] = useState(false);
+  const [busca, setBusca] = useState("");
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -51,6 +67,14 @@ function Clientes() {
     }
   }
 
+  const clientesFiltrados = clientes.filter((c) => {
+    const termo = busca.toLowerCase();
+    return (
+      c.nome.toLowerCase().includes(termo) ||
+      c.email.toLowerCase().includes(termo)
+    );
+  });
+
   return (
     <Layout>
       <div className="clientes-header">
@@ -76,6 +100,7 @@ function Clientes() {
               <input
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
+                placeholder="Nome completo"
                 required
               />
             </div>
@@ -85,6 +110,7 @@ function Clientes() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="email@exemplo.com"
                 required
               />
             </div>
@@ -93,6 +119,7 @@ function Clientes() {
               <input
                 value={telefone}
                 onChange={(e) => setTelefone(e.target.value)}
+                placeholder="(00) 00000-0000"
                 required
               />
             </div>
@@ -101,6 +128,7 @@ function Clientes() {
               <input
                 value={endereco}
                 onChange={(e) => setEndereco(e.target.value)}
+                placeholder="Rua, número - Bairro, Cidade"
                 required
               />
             </div>
@@ -114,20 +142,51 @@ function Clientes() {
         </form>
       )}
 
+      {!mostrarForm && clientes.length > 0 && (
+        <div className="clientes-filtros">
+          <input
+            type="text"
+            className="clientes-busca-input"
+            placeholder="Buscar por nome ou email..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </div>
+      )}
+
       {carregando && <p className="clientes-msg">Carregando clientes...</p>}
       {erro && !mostrarForm && <p className="clientes-msg erro">{erro}</p>}
 
-      {!carregando && (
+      {!carregando && clientesFiltrados.length === 0 && (
+        <p className="clientes-msg">Nenhum cliente encontrado.</p>
+      )}
+
+      {!carregando && clientesFiltrados.length > 0 && (
         <div className="clientes-grid">
-          {clientes.map((c) => (
+          {clientesFiltrados.map((c) => (
             <div key={c.id} className="cliente-card">
-              <div className="cliente-avatar">
+              <div
+                className="cliente-avatar"
+                style={{ background: corPorNome(c.nome) }}
+              >
                 {c.nome.charAt(0).toUpperCase()}
               </div>
               <div className="cliente-info">
-                <h3>{c.nome}</h3>
-                <p>{c.email}</p>
-                <p className="cliente-tel">{c.telefone}</p>
+                <h3>{formatarNome(c.nome)}</h3>
+                <div className="cliente-detalhe">
+                  <span className="cliente-icone">✉</span>
+                  <span>{c.email}</span>
+                </div>
+                <div className="cliente-detalhe">
+                  <span className="cliente-icone">☎</span>
+                  <span>{c.telefone}</span>
+                </div>
+                {c.endereco && (
+                  <div className="cliente-detalhe">
+                    <span className="cliente-icone">📍</span>
+                    <span>{c.endereco}</span>
+                  </div>
+                )}
               </div>
             </div>
           ))}

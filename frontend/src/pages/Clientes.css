@@ -163,3 +163,76 @@
   font-family: 'JetBrains Mono', monospace;
   margin-top: 2px !important;
 }
+.clientes-filtros {
+  margin-bottom: 20px;
+}
+
+.clientes-busca-input {
+  width: 100%;
+  max-width: 320px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #2b303a;
+  background: #1c2027;
+  color: #e7e9ec;
+  font-size: 14px;
+}
+
+.clientes-busca-input::placeholder {
+  color: #8a93a3;
+}
+
+.clientes-busca-input:focus {
+  outline: none;
+  border-color: #f5a524;
+}
+
+.cliente-card {
+  display: flex;
+  gap: 14px;
+  background: #1c2027;
+  border-radius: 14px;
+  padding: 18px;
+  align-items: flex-start;
+}
+
+.cliente-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: #14171c;
+  flex-shrink: 0;
+}
+
+.cliente-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cliente-info h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: #e7e9ec;
+}
+
+.cliente-detalhe {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #8a93a3;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cliente-icone {
+  flex-shrink: 0;
+  width: 14px;
+}
