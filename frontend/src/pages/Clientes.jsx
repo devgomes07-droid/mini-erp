@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { listarClientes, criarCliente } from "../services/api";
+import {
+  listarClientes,
+  criarCliente,
+  atualizarCliente,
+  deletarCliente,
+} from "../services/api";
 import Layout from "../components/Layout";
 import "./Clientes.css";
 
@@ -24,6 +29,8 @@ function Clientes() {
   const [erro, setErro] = useState("");
   const [mostrarForm, setMostrarForm] = useState(false);
   const [busca, setBusca] = useState("");
+  const [editandoId, setEditandoId] = useState(null);
+  const [excluindoId, setExcluindoId] = useState(null);
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -47,23 +54,60 @@ function Clientes() {
     carregar();
   }, []);
 
+  function limparFormulario() {
+    setNome("");
+    setEmail("");
+    setTelefone("");
+    setEndereco("");
+    setEditandoId(null);
+    setMostrarForm(false);
+  }
+
+  function iniciarEdicao(cliente) {
+    setNome(cliente.nome);
+    setEmail(cliente.email);
+    setTelefone(cliente.telefone);
+    setEndereco(cliente.endereco || "");
+    setEditandoId(cliente.id);
+    setMostrarForm(true);
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setSalvando(true);
     setErro("");
 
     try {
-      await criarCliente({ nome, email, telefone, endereco });
-      setNome("");
-      setEmail("");
-      setTelefone("");
-      setEndereco("");
-      setMostrarForm(false);
+      if (editandoId) {
+        await atualizarCliente(editandoId, { nome, email, telefone, endereco });
+      } else {
+        await criarCliente({ nome, email, telefone, endereco });
+      }
+      limparFormulario();
       await carregar();
     } catch (err) {
       setErro(err.message);
     } finally {
       setSalvando(false);
+    }
+  }
+
+  async function handleExcluir(id) {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir este cliente? Essa ação não pode ser desfeita."
+    );
+    if (!confirmar) return;
+
+    setExcluindoId(id);
+    setErro("");
+
+    try {
+      await deletarCliente(id);
+      await carregar();
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setExcluindoId(null);
     }
   }
 
@@ -86,7 +130,13 @@ function Clientes() {
         </div>
         <button
           className="clientes-btn-novo"
-          onClick={() => setMostrarForm(!mostrarForm)}
+          onClick={() => {
+            if (mostrarForm) {
+              limparFormulario();
+            } else {
+              setMostrarForm(true);
+            }
+          }}
         >
           {mostrarForm ? "Cancelar" : "+ Novo cliente"}
         </button>
@@ -137,7 +187,11 @@ function Clientes() {
           {erro && <p className="clientes-erro">{erro}</p>}
 
           <button type="submit" className="clientes-btn-salvar" disabled={salvando}>
-            {salvando ? "Salvando..." : "Salvar cliente"}
+            {salvando
+              ? "Salvando..."
+              : editandoId
+              ? "Salvar alterações"
+              : "Salvar cliente"}
           </button>
         </form>
       )}
@@ -187,6 +241,21 @@ function Clientes() {
                     <span>{c.endereco}</span>
                   </div>
                 )}
+              </div>
+              <div className="cliente-acoes">
+                <button
+                  className="cliente-btn-editar"
+                  onClick={() => iniciarEdicao(c)}
+                >
+                  Editar
+                </button>
+                <button
+                  className="cliente-btn-excluir"
+                  onClick={() => handleExcluir(c.id)}
+                  disabled={excluindoId === c.id}
+                >
+                  {excluindoId === c.id ? "..." : "Excluir"}
+                </button>
               </div>
             </div>
           ))}

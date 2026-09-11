@@ -79,6 +79,40 @@ export async function criarCliente(cliente) {
   return res.json();
 }
 
+export async function atualizarCliente(id, cliente) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/clientes/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(cliente),
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao atualizar cliente");
+  }
+
+  return res.json();
+}
+
+export async function deletarCliente(id) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/clientes/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao excluir cliente");
+  }
+}
+
 export async function criarPedido(pedido) {
   const token = localStorage.getItem("token");
 
