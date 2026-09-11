@@ -1,5 +1,10 @@
 const API_URL = "https://mini-erp-api-qh1u.onrender.com";
 
+async function extrairErro(res, mensagemPadrao) {
+  const erro = await res.json().catch(() => null);
+  throw new Error(erro?.message || mensagemPadrao);
+}
+
 export async function login(email, senha) {
   const res = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
@@ -8,7 +13,7 @@ export async function login(email, senha) {
   });
 
   if (!res.ok) {
-    throw new Error("Email ou senha inválidos");
+    await extrairErro(res, "Email ou senha inválidos");
   }
 
   return res.json();
@@ -22,7 +27,7 @@ export async function registrar(email, senha) {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao cadastrar. Email pode já estar em uso.");
+    await extrairErro(res, "Erro ao cadastrar. Email pode já estar em uso.");
   }
 
   return res.json();
@@ -38,7 +43,7 @@ export async function listarProdutos() {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao buscar produtos");
+    await extrairErro(res, "Erro ao buscar produtos");
   }
 
   return res.json();
@@ -54,7 +59,7 @@ export async function listarClientes() {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao buscar clientes");
+    await extrairErro(res, "Erro ao buscar clientes");
   }
 
   return res.json();
@@ -73,7 +78,7 @@ export async function criarCliente(cliente) {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao criar cliente");
+    await extrairErro(res, "Erro ao criar cliente");
   }
 
   return res.json();
@@ -92,7 +97,7 @@ export async function atualizarCliente(id, cliente) {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao atualizar cliente");
+    await extrairErro(res, "Erro ao atualizar cliente");
   }
 
   return res.json();
@@ -109,7 +114,7 @@ export async function deletarCliente(id) {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao excluir cliente");
+    await extrairErro(res, "Erro ao excluir cliente");
   }
 }
 
@@ -126,7 +131,7 @@ export async function criarPedido(pedido) {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao criar pedido");
+    await extrairErro(res, "Erro ao criar pedido");
   }
 
   return res.json();
@@ -143,10 +148,7 @@ export async function confirmarPedido(id) {
   });
 
   if (!res.ok) {
-    if (res.status === 409) {
-      throw new Error("Conflito de estoque — outro pedido já consumiu essa quantidade");
-    }
-    throw new Error("Erro ao confirmar pedido");
+    await extrairErro(res, "Erro ao confirmar pedido");
   }
 
   return res.json();
@@ -163,7 +165,7 @@ export async function cancelarPedido(id) {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao cancelar pedido");
+    await extrairErro(res, "Erro ao cancelar pedido");
   }
 }
 
@@ -177,7 +179,7 @@ export async function listarPedidos() {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao buscar pedidos");
+    await extrairErro(res, "Erro ao buscar pedidos");
   }
 
   return res.json();
@@ -193,7 +195,7 @@ export async function buscarFaturamento(inicio, fim) {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao buscar relatório de faturamento");
+    await extrairErro(res, "Erro ao buscar relatório de faturamento");
   }
 
   return res.json();
@@ -212,7 +214,7 @@ export async function criarProduto(produto) {
   });
 
   if (!res.ok) {
-    throw new Error("Erro ao criar produto");
+    await extrairErro(res, "Erro ao criar produto");
   }
 
   return res.json();
