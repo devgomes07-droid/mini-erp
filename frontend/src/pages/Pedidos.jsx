@@ -12,6 +12,7 @@ import Layout from "../components/Layout";
 import DetalhePedido from "../components/DetalhePedido";
 import Toast from "../components/Toast";
 import ConfirmModal from "../components/ConfirmModal";
+import EnderecoCep from "../components/EnderecoCep";
 import "./Pedidos.css";
 
 function Pedidos() {
@@ -86,7 +87,7 @@ function Pedidos() {
   }
 
   async function handleCriarPedido() {
-    if (!clienteId || itens.length === 0) return;
+    if (!clienteId || itens.length === 0 || !enderecoEntrega) return;
     setCriando(true);
     setErro("");
 
@@ -181,12 +182,7 @@ function Pedidos() {
 
           <div className="pedidos-field">
             <label>Endereço de entrega</label>
-            <input
-              type="text"
-              value={enderecoEntrega}
-              onChange={(e) => setEnderecoEntrega(e.target.value)}
-              placeholder="Rua, número - Bairro, Cidade"
-            />
+            <EnderecoCep onEnderecoCompleto={setEnderecoEntrega} />
           </div>
 
           <div className="pedidos-add-item">
@@ -239,7 +235,7 @@ function Pedidos() {
           <button
             className="pedidos-btn-criar"
             onClick={handleCriarPedido}
-            disabled={!clienteId || itens.length === 0 || criando}
+            disabled={!clienteId || itens.length === 0 || !enderecoEntrega || criando}
           >
             {criando ? "Criando..." : "Criar pedido"}
           </button>

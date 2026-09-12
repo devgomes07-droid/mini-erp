@@ -1,0 +1,66 @@
+.endereco-cep-linha {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.endereco-cep-field label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a93a3;
+  margin-bottom: 6px;
+}
+
+.endereco-cep-field input {
+  width: 100%;
+  padding: 10px 12px;
+  background: #14171c;
+  border: 1px solid #2b303a;
+  border-radius: 8px;
+  color: #e7e9ec;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.endereco-cep-field input:focus {
+  border-color: #f5a524;
+}
+
+.endereco-cep-field input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.endereco-cep-status {
+  font-size: 12.5px;
+  color: #8a93a3;
+  margin: 0 0 12px;
+}
+
+.endereco-cep-erro {
+  font-size: 12.5px;
+  color: #ff8080;
+  margin: 0 0 12px;
+}
+
+.endereco-cep-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #14171c;
+  border: 1px solid #2b303a;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #e7e9ec;
+  margin-bottom: 12px;
+}
+
+.endereco-cep-preview span:first-child {
+  font-weight: 600;
+}

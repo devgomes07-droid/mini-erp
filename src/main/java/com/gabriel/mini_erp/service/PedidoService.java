@@ -10,6 +10,7 @@ import com.gabriel.mini_erp.entity.Pedido;
 import com.gabriel.mini_erp.entity.Produto;
 import com.gabriel.mini_erp.enums.StatusPedido;
 import com.gabriel.mini_erp.exception.EstoqueInsuficienteException;
+import com.gabriel.mini_erp.exception.RegraNegocioViolada;
 import com.gabriel.mini_erp.repository.ClienteRepository;
 import com.gabriel.mini_erp.repository.PedidoRepository;
 import com.gabriel.mini_erp.repository.ProdutoRepository;
@@ -41,6 +42,10 @@ public class PedidoService {
 
     @Transactional
     public PedidoResponseDTO criar(PedidoRequestDTO dto) {
+        if (dto.getEnderecoEntrega() == null || dto.getEnderecoEntrega().isBlank()) {
+            throw new RegraNegocioViolada("O endereço de entrega é obrigatório.");
+        }
+
         Cliente cliente = clienteRepository.findById(dto.getClienteId())
                 .orElseThrow(() -> new NoSuchElementException("Cliente não encontrado com id: " + dto.getClienteId()));
 
