@@ -59,13 +59,12 @@ function Pedidos() {
     carregarTudo();
   }, []);
 
-  // Ao chegar na tela vindo do carrinho (Produtos), pré-preenche o formulário
   useEffect(() => {
     if (itensCarrinho.length > 0) {
       setItens(itensCarrinho);
       setMostrarForm(true);
     }
-  }, []); // roda só uma vez, ao montar
+  }, []);
 
   function adicionarItem() {
     if (!produtoSelecionado || quantidade < 1) return;
@@ -167,7 +166,7 @@ function Pedidos() {
       {erro && <p className="pedidos-erro">{erro}</p>}
 
       {mostrarForm && (
-        <div className="pedidos-form">
+        <div className="pedidos-form pedidos-form-anim">
           <div className="pedidos-field">
             <label>Cliente</label>
             <select value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
@@ -224,7 +223,7 @@ function Pedidos() {
           {itens.length > 0 && (
             <div className="pedidos-carrinho">
               {itens.map((item, i) => (
-                <div key={i} className="pedidos-carrinho-item">
+                <div key={i} className="pedidos-carrinho-item pedidos-carrinho-item-anim">
                   <span>{item.quantidade}x {item.nome}</span>
                   <span>R$ {(item.preco * item.quantidade).toFixed(2)}</span>
                   <button onClick={() => removerItem(i)}>×</button>
@@ -262,20 +261,31 @@ function Pedidos() {
         </button>
       </div>
 
-      {carregando && <p className="pedidos-msg">Carregando...</p>}
+      {carregando && (
+        <div className="pedidos-historico-lista">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="pedido-skeleton" />
+          ))}
+        </div>
+      )}
 
       {!carregando && listaExibida.length === 0 && (
-        <p className="pedidos-msg">Nenhum pedido {aba === "pendentes" ? "pendente" : "confirmado"}.</p>
+        <div className="pedidos-vazio">
+          <span className="pedidos-vazio-icone">📦</span>
+          <p className="pedidos-msg">
+            Nenhum pedido {aba === "pendentes" ? "pendente" : "confirmado"}.
+          </p>
+        </div>
       )}
 
       {!carregando && listaExibida.length > 0 && (
         <div className="pedidos-historico-lista">
-          {listaExibida.map((p) => (
+          {listaExibida.map((p, index) => (
             <div
               key={p.id}
               className="pedidos-historico-item"
               onClick={() => setPedidoSelecionado(p)}
-              style={{ cursor: "pointer" }}
+              style={{ animationDelay: `${index * 40}ms` }}
             >
               <div className="pedidos-historico-info">
                 <span className="pedidos-historico-cliente">
