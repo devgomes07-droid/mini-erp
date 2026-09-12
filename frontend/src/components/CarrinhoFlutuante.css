@@ -1,0 +1,52 @@
+.carrinho-flutuante {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #f5a524;
+  color: #14171c;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(245, 165, 36, 0.4);
+  animation: carrinho-entrar 0.2s ease-out;
+}
+
+@keyframes carrinho-entrar {
+  from {
+    transform: scale(0.8) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.carrinho-flutuante:hover {
+  filter: brightness(1.05);
+}
+
+.carrinho-flutuante-badge {
+  background: #14171c;
+  color: #f5a524;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.carrinho-flutuante-total {
+  font-family: 'JetBrains Mono', monospace;
+  opacity: 0.85;
+}

@@ -7,8 +7,11 @@ import {
   confirmarPedido,
   cancelarPedido,
 } from "../services/api";
+import { useCarrinho } from "../context/CarrinhoContext";
 import Layout from "../components/Layout";
 import DetalhePedido from "../components/DetalhePedido";
+import Toast from "../components/Toast";
+import ConfirmModal from "../components/ConfirmModal";
 import "./Pedidos.css";
 
 function Pedidos() {
@@ -21,6 +24,8 @@ function Pedidos() {
   const [confirmandoId, setConfirmandoId] = useState(null);
   const [cancelandoId, setCancelandoId] = useState(null);
   const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [pedidoParaCancelar, setPedidoParaCancelar] = useState(null);
 
   const [clienteId, setClienteId] = useState("");
   const [enderecoEntrega, setEnderecoEntrega] = useState("");
@@ -29,6 +34,8 @@ function Pedidos() {
   const [quantidade, setQuantidade] = useState(1);
   const [criando, setCriando] = useState(false);
   const [mostrarForm, setMostrarForm] = useState(false);
+
+  const { itens: itensCarrinho, removerItem: removerDoCarrinho, limparCarrinho } = useCarrinho();
 
   async function carregarTudo() {
     try {
@@ -52,6 +59,14 @@ function Pedidos() {
     carregarTudo();
   }, []);
 
+  // Ao chegar na tela vindo do carrinho (Produtos), pré-preenche o formulário
+  useEffect(() => {
+    if (itensCarrinho.length > 0) {
+      setItens(itensCarrinho);
+      setMostrarForm(true);
+    }
+  }, []); // roda só uma vez, ao montar
+
   function adicionarItem() {
     if (!produtoSelecionado || quantidade < 1) return;
     const produto = produtos.find((p) => p.id === Number(produtoSelecionado));
@@ -66,7 +81,9 @@ function Pedidos() {
   }
 
   function removerItem(index) {
+    const item = itens[index];
     setItens(itens.filter((_, i) => i !== index));
+    removerDoCarrinho(item.produtoId);
   }
 
   async function handleCriarPedido() {
@@ -84,6 +101,8 @@ function Pedidos() {
       setClienteId("");
       setEnderecoEntrega("");
       setMostrarForm(false);
+      limparCarrinho();
+      setToast({ tipo: "sucesso", mensagem: "Pedido criado com sucesso." });
       await carregarTudo();
     } catch (err) {
       setErro(err.message);
@@ -98,30 +117,32 @@ function Pedidos() {
 
     try {
       await confirmarPedido(id);
+      setToast({ tipo: "sucesso", mensagem: "Pedido confirmado." });
       await carregarTudo();
     } catch (err) {
-      setErro(err.message);
+      setToast({ tipo: "erro", mensagem: err.message });
     } finally {
       setConfirmandoId(null);
     }
   }
 
-  async function handleCancelar(id) {
-    const confirmar = window.confirm(
-      "Tem certeza que deseja cancelar este pedido? Se já estiver confirmado, o estoque será devolvido."
-    );
-    if (!confirmar) return;
+  function pedirConfirmacaoCancelamento(id) {
+    setPedidoParaCancelar(id);
+  }
 
+  async function confirmarCancelamento() {
+    const id = pedidoParaCancelar;
     setCancelandoId(id);
-    setErro("");
 
     try {
       await cancelarPedido(id);
+      setToast({ tipo: "sucesso", mensagem: "Pedido cancelado." });
       await carregarTudo();
     } catch (err) {
-      setErro(err.message);
+      setToast({ tipo: "erro", mensagem: err.message });
     } finally {
       setCancelandoId(null);
+      setPedidoParaCancelar(null);
     }
   }
 
@@ -292,7 +313,7 @@ function Pedidos() {
 
                 <button
                   className="pedidos-btn-cancelar-mini"
-                  onClick={() => handleCancelar(p.id)}
+                  onClick={() => pedirConfirmacaoCancelamento(p.id)}
                   disabled={cancelandoId === p.id}
                 >
                   {cancelandoId === p.id ? "..." : "Cancelar"}
@@ -307,6 +328,24 @@ function Pedidos() {
         pedido={pedidoSelecionado}
         onClose={() => setPedidoSelecionado(null)}
       />
+
+      {toast && (
+        <Toast
+          tipo={toast.tipo}
+          mensagem={toast.mensagem}
+          onFechar={() => setToast(null)}
+        />
+      )}
+
+      {pedidoParaCancelar && (
+        <ConfirmModal
+          titulo="Cancelar pedido"
+          mensagem="Tem certeza que deseja cancelar este pedido? Se já estiver confirmado, o estoque será devolvido."
+          onConfirmar={confirmarCancelamento}
+          onCancelar={() => setPedidoParaCancelar(null)}
+          confirmando={cancelandoId === pedidoParaCancelar}
+        />
+      )}
     </Layout>
   );
 }

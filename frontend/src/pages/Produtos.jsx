@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { listarProdutos } from "../services/api";
+import { useCarrinho } from "../context/CarrinhoContext";
 import Layout from "../components/Layout";
+import ProdutoModal from "../components/ProdutoModal";
+import CarrinhoFlutuante from "../components/CarrinhoFlutuante";
+import Toast from "../components/Toast";
 import "./Produtos.css";
 
 function Produtos() {
@@ -9,6 +13,10 @@ function Produtos() {
   const [carregando, setCarregando] = useState(true);
   const [busca, setBusca] = useState("");
   const [categoriaFiltro, setCategoriaFiltro] = useState("");
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  const { itens: itensCarrinho, adicionarItem } = useCarrinho();
 
   useEffect(() => {
     async function carregar() {
@@ -38,6 +46,21 @@ function Produtos() {
   const estoqueBaixoCount = produtos.filter(
     (p) => p.quantidadeEstoque <= p.estoqueMinimo
   ).length;
+
+  function quantidadeNoCarrinho(produtoId) {
+    const item = itensCarrinho.find((i) => i.produtoId === produtoId);
+    return item ? item.quantidade : 0;
+  }
+
+  function handleAbrirProduto(produto) {
+    if (produto.quantidadeEstoque <= 0) return;
+    setProdutoSelecionado(produto);
+  }
+
+  function handleAdicionarAoCarrinho(produto, quantidade) {
+    adicionarItem(produto, quantidade);
+    setToast({ tipo: "sucesso", mensagem: `${quantidade}x ${produto.nome} adicionado ao pedido.` });
+  }
 
   return (
     <Layout>
@@ -77,8 +100,15 @@ function Produtos() {
         </select>
       </div>
 
-      {carregando && <p className="produtos-msg">Carregando produtos...</p>}
       {erro && <p className="produtos-msg erro">{erro}</p>}
+
+      {carregando && (
+        <div className="produtos-grid">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="produto-skeleton" />
+          ))}
+        </div>
+      )}
 
       {!carregando && produtosFiltrados.length === 0 && (
         <p className="produtos-msg">Nenhum produto encontrado.</p>
@@ -86,13 +116,24 @@ function Produtos() {
 
       {!carregando && !erro && (
         <div className="produtos-grid">
-          {produtosFiltrados.map((p) => {
+          {produtosFiltrados.map((p, index) => {
             const estoqueBaixo = p.quantidadeEstoque <= p.estoqueMinimo;
+            const semEstoque = p.quantidadeEstoque <= 0;
+            const qtdNoCarrinho = quantidadeNoCarrinho(p.id);
+
             return (
-              <div key={p.id} className="produto-card">
+              <div
+                key={p.id}
+                className={`produto-card ${semEstoque ? "produto-card-desabilitado" : ""}`}
+                onClick={() => handleAbrirProduto(p)}
+                style={{ animationDelay: `${index * 40}ms` }}
+              >
                 <div className="produto-card-top">
                   <span className="produto-categoria">{p.categoria}</span>
-                  {estoqueBaixo && (
+                  {semEstoque && (
+                    <span className="produto-alerta-critico">Sem estoque</span>
+                  )}
+                  {!semEstoque && estoqueBaixo && (
                     <span className="produto-alerta">Estoque baixo</span>
                   )}
                 </div>
@@ -108,10 +149,35 @@ function Produtos() {
                     {p.quantidadeEstoque} un
                   </span>
                 </div>
+
+                {qtdNoCarrinho > 0 && (
+                  <div className="produto-card-badge-carrinho">
+                    {qtdNoCarrinho} no pedido
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
+      )}
+
+      <ProdutoModal
+        produto={produtoSelecionado}
+        quantidadeNoCarrinho={
+          produtoSelecionado ? quantidadeNoCarrinho(produtoSelecionado.id) : 0
+        }
+        onClose={() => setProdutoSelecionado(null)}
+        onAdicionar={handleAdicionarAoCarrinho}
+      />
+
+      <CarrinhoFlutuante />
+
+      {toast && (
+        <Toast
+          tipo={toast.tipo}
+          mensagem={toast.mensagem}
+          onFechar={() => setToast(null)}
+        />
       )}
     </Layout>
   );

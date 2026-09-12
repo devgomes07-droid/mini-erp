@@ -268,3 +268,72 @@
 .produtos-categoria-select:focus {
   border-color: #f5a524;
 }
+.produto-card {
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  animation: produto-entrar 0.3s ease-out backwards;
+  position: relative;
+}
+
+@keyframes produto-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.produto-card:hover {
+  transform: translateY(-3px);
+  border-color: #f5a524;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.produto-card-desabilitado {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.produto-card-desabilitado:hover {
+  transform: none;
+  border-color: #2b303a;
+  box-shadow: none;
+}
+
+.produto-alerta-critico {
+  font-size: 11px;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.produto-card-badge-carrinho {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #f5a524;
+  color: #14171c;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.produto-skeleton {
+  height: 168px;
+  background: linear-gradient(90deg, #1c2027 25%, #23272f 50%, #1c2027 75%);
+  background-size: 200% 100%;
+  border-radius: 12px;
+  animation: skeleton-pulso 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulso {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

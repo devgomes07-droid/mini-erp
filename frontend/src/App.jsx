@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { CarrinhoProvider } from "./context/CarrinhoContext";
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import Produtos from "./pages/Produtos";
@@ -9,44 +10,46 @@ import RotaProtegida from "./components/RotaProtegida";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/cadastro" element={<Cadastro />} />
-        <Route
-          path="/dashboard"
-          element={
-            <RotaProtegida>
-              <Dashboard />
-            </RotaProtegida>
-          }
-        />
-        <Route
-          path="/produtos"
-          element={
-            <RotaProtegida>
-              <Produtos />
-            </RotaProtegida>
-          }
-        />
-        <Route
-          path="/clientes"
-          element={
-            <RotaProtegida>
-              <Clientes />
-            </RotaProtegida>
-          }
-        />
-        <Route
-          path="/pedidos"
-          element={
-            <RotaProtegida>
-              <Pedidos />
-            </RotaProtegida>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <CarrinhoProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+          <Route
+            path="/dashboard"
+            element={
+              <RotaProtegida>
+                <Dashboard />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/produtos"
+            element={
+              <RotaProtegida>
+                <Produtos />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/clientes"
+            element={
+              <RotaProtegida>
+                <Clientes />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/pedidos"
+            element={
+              <RotaProtegida>
+                <Pedidos />
+              </RotaProtegida>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </CarrinhoProvider>
   );
 }
 
