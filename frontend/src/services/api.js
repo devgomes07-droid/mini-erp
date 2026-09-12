@@ -219,3 +219,17 @@ export async function criarProduto(produto) {
 
   return res.json();
 }
+export async function excluirConta() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/auth/me`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    await extrairErro(res, "Não foi possível excluir a conta");
+  }
+}

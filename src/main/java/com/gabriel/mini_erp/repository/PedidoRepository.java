@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
+    boolean existsByClienteId(Long clienteId);
+
     @Query("SELECT COALESCE(SUM(p.valorTotal), 0) FROM Pedido p " +
             "WHERE p.status = 'CONFIRMADO' AND p.dataPedido BETWEEN :inicio AND :fim")
     BigDecimal calcularTotalFaturado(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);

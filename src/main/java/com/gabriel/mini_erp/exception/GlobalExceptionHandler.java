@@ -21,7 +21,6 @@ public class GlobalExceptionHandler {
         body.put("status", HttpStatus.NOT_FOUND.value());
         body.put("error", "Not Found");
         body.put("message", ex.getMessage());
-
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
@@ -32,7 +31,6 @@ public class GlobalExceptionHandler {
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("error", "Bad Request");
         body.put("message", ex.getMessage());
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
@@ -43,7 +41,6 @@ public class GlobalExceptionHandler {
         body.put("status", HttpStatus.CONFLICT.value());
         body.put("error", "Conflict");
         body.put("message", ex.getMessage());
-
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
@@ -54,7 +51,6 @@ public class GlobalExceptionHandler {
         body.put("status", HttpStatus.CONFLICT.value());
         body.put("error", "Conflict");
         body.put("message", ex.getMessage());
-
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
@@ -65,7 +61,6 @@ public class GlobalExceptionHandler {
         body.put("status", HttpStatus.CONFLICT.value());
         body.put("error", "Conflict");
         body.put("message", "O recurso foi modificado por outra requisição simultânea. Tente novamente.");
-
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
@@ -76,7 +71,16 @@ public class GlobalExceptionHandler {
         body.put("status", HttpStatus.CONFLICT.value());
         body.put("error", "Conflict");
         body.put("message", "Não é possível excluir este registro pois ele está sendo usado em outro lugar do sistema (ex: cliente com pedidos vinculados)");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
 
+    @ExceptionHandler(RegraNegocioViolada.class)
+    public ResponseEntity<Map<String, Object>> handleRegraNegocioViolada(RegraNegocioViolada ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now().toString());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Conflict");
+        body.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 }
