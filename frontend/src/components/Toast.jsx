@@ -1,3 +1,5 @@
+import "./Toast.css";
+
 function Toast({ tipo, mensagem, onFechar }) {
   return (
     <div className={`toast ${tipo === "sucesso" ? "toast-sucesso" : "toast-erro"}`}>

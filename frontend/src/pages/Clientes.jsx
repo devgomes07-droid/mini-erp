@@ -6,6 +6,7 @@ import {
   deletarCliente,
 } from "../services/api";
 import Layout from "../components/Layout";
+import Toast from "../components/Toast";
 import "./Clientes.css";
 
 const CORES_AVATAR = ["#f5a524", "#4ade80", "#818cf8", "#f472b6", "#38bdf8", "#fb923c"];
@@ -31,6 +32,7 @@ function Clientes() {
   const [busca, setBusca] = useState("");
   const [editandoId, setEditandoId] = useState(null);
   const [excluindoId, setExcluindoId] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -80,8 +82,10 @@ function Clientes() {
     try {
       if (editandoId) {
         await atualizarCliente(editandoId, { nome, email, telefone, endereco });
+        setToast({ tipo: "sucesso", mensagem: "Cliente atualizado com sucesso." });
       } else {
         await criarCliente({ nome, email, telefone, endereco });
+        setToast({ tipo: "sucesso", mensagem: "Cliente criado com sucesso." });
       }
       limparFormulario();
       await carregar();
@@ -99,13 +103,13 @@ function Clientes() {
     if (!confirmar) return;
 
     setExcluindoId(id);
-    setErro("");
 
     try {
       await deletarCliente(id);
+      setToast({ tipo: "sucesso", mensagem: "Cliente excluído com sucesso." });
       await carregar();
     } catch (err) {
-      setErro(err.message);
+      setToast({ tipo: "erro", mensagem: err.message });
     } finally {
       setExcluindoId(null);
     }
@@ -209,7 +213,6 @@ function Clientes() {
       )}
 
       {carregando && <p className="clientes-msg">Carregando clientes...</p>}
-      {erro && !mostrarForm && <p className="clientes-msg erro">{erro}</p>}
 
       {!carregando && clientesFiltrados.length === 0 && (
         <p className="clientes-msg">Nenhum cliente encontrado.</p>
@@ -260,6 +263,14 @@ function Clientes() {
             </div>
           ))}
         </div>
+      )}
+
+      {toast && (
+        <Toast
+          tipo={toast.tipo}
+          mensagem={toast.mensagem}
+          onFechar={() => setToast(null)}
+        />
       )}
     </Layout>
   );
