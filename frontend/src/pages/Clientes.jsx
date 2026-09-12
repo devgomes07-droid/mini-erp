@@ -7,6 +7,7 @@ import {
 } from "../services/api";
 import Layout from "../components/Layout";
 import Toast from "../components/Toast";
+import ConfirmModal from "../components/ConfirmModal";
 import "./Clientes.css";
 
 const CORES_AVATAR = ["#f5a524", "#4ade80", "#818cf8", "#f472b6", "#38bdf8", "#fb923c"];
@@ -33,6 +34,7 @@ function Clientes() {
   const [editandoId, setEditandoId] = useState(null);
   const [excluindoId, setExcluindoId] = useState(null);
   const [toast, setToast] = useState(null);
+  const [clienteParaExcluir, setClienteParaExcluir] = useState(null); // id ou null
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -96,12 +98,12 @@ function Clientes() {
     }
   }
 
-  async function handleExcluir(id) {
-    const confirmar = window.confirm(
-      "Tem certeza que deseja excluir este cliente? Essa ação não pode ser desfeita."
-    );
-    if (!confirmar) return;
+  function pedirConfirmacaoExclusao(id) {
+    setClienteParaExcluir(id);
+  }
 
+  async function confirmarExclusao() {
+    const id = clienteParaExcluir;
     setExcluindoId(id);
 
     try {
@@ -112,6 +114,7 @@ function Clientes() {
       setToast({ tipo: "erro", mensagem: err.message });
     } finally {
       setExcluindoId(null);
+      setClienteParaExcluir(null);
     }
   }
 
@@ -254,7 +257,7 @@ function Clientes() {
                 </button>
                 <button
                   className="cliente-btn-excluir"
-                  onClick={() => handleExcluir(c.id)}
+                  onClick={() => pedirConfirmacaoExclusao(c.id)}
                   disabled={excluindoId === c.id}
                 >
                   {excluindoId === c.id ? "..." : "Excluir"}
@@ -270,6 +273,16 @@ function Clientes() {
           tipo={toast.tipo}
           mensagem={toast.mensagem}
           onFechar={() => setToast(null)}
+        />
+      )}
+
+      {clienteParaExcluir && (
+        <ConfirmModal
+          titulo="Excluir cliente"
+          mensagem="Tem certeza que deseja excluir este cliente? Essa ação não pode ser desfeita."
+          onConfirmar={confirmarExclusao}
+          onCancelar={() => setClienteParaExcluir(null)}
+          confirmando={excluindoId === clienteParaExcluir}
         />
       )}
     </Layout>
